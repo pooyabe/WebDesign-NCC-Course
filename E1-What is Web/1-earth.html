@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبیه‌ساز سفر یک کلیک | جلسه اول</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            user-select: none;
+        }
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* رابط کاربری شیشه‌ای (Glassmorphism) */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            z-index: 10;
+        }
+
+        /* نوار مرورگر شبیه‌سازی شده در بالا */
+        .top-bar {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 750px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+            margin-left: 8px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+        
+        .url-input {
+            flex: 1;
+            background: rgba(3, 7, 18, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            direction: ltr;
+            text-align: left;
+            font-family: monospace;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .url-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+        .btn-send {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        /* پنل داستان‌گویی سمت راست */
+        .story-panel {
+            position: absolute;
+            top: 110px;
+            right: 24px;
+            width: 360px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .step-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            width: fit-content;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        .story-desc {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+        .packet-info {
+            background: rgba(0, 0, 0, 0.45);
+            border-right: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            direction: ltr;
+            text-align: left;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+        }
+
+        /* پنل شبیه‌ساز سرور و مرورگر سمت چپ */
+        .inspector-panel {
+            position: absolute;
+            top: 110px;
+            left: 24px;
+            width: 380px;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .terminal-box {
+            background: #090d16;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+            font-size: 0.85rem;
+            color: #10b981;
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .rendered-preview {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 10px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .rendered-preview h3 {
+            color: #2563eb;
+            font-size: 1.2rem;
+        }
+        .rendered-preview button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            width: fit-content;
+            font-size: 0.85rem;
+        }
+
+        /* کنترل‌های پایین صفحه برای استاد */
+        .controls-bar {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ctrl-btn {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover, .ctrl-btn.active {
+            background: #38bdf8;
+            color: #030712;
+            font-weight: bold;
+            border-color: #38bdf8;
+        }
+
+        /* برچسب‌های شناور روی شهرها */
+        .city-label {
+            position: absolute;
+            transform: translate(-50%, -120%);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .city-label span {
+            color: #38bdf8;
+            font-family: monospace;
+            font-size: 0.75rem;
+            display: block;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="labels-container"></div>
+
+    <!-- نوار آدرس بالا -->
+    <div class="top-bar glass-panel">
+        <div class="browser-dots">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+        </div>
+        <input type="text" id="urlInput" class="url-input" value="https://digikala.com/products" />
+        <button class="btn-send" onclick="startFullJourney()">ارسال درخواست (Enter)</button>
+    </div>
+
+    <!-- پنل توضیحات مرحله به مرحله (راست) -->
+    <div class="story-panel glass-panel">
+        <div class="step-badge" id="stepBadge">آماده حرکت</div>
+        <div class="story-title" id="storyTitle">سفر ۲۰۰ میلی‌ثانیه‌ای یک کلیک</div>
+        <div class="story-desc" id="storyDesc">
+            کره زمین را با موس بچرخانید. نقاط درخشان، مراکز اصلی اینترنت هستند. با زدن دکمه بالا یا دکمه‌های کنترل پایین، ببینید وقتی آدرس سایتی را وارد می‌کنید، چه اتفاقی در کف اقیانوس‌ها و سرورهای آن سر دنیا می‌افتد.
+        </div>
+        <div class="packet-info" id="packetInfo">Status: Waiting for user input...
+Client Location: Tehran, Iran
+Target URL: https://digikala.com</div>
+    </div>
+
+    <!-- پنل کالبدشکافی سرور و خروجی (چپ) -->
+    <div class="inspector-panel glass-panel" id="inspectorPanel">
+        <div class="step-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16,185,129,0.3);">داخل کامپیوتر مقصد (سرور)</div>
+        <div class="terminal-box" id="terminalBox"></div>
+        <div class="rendered-preview" id="renderedPreview">
+            <h3>فروشگاه اینترنتی</h3>
+            <p style="font-size: 0.85rem; color: #475569;">این تصویر جادویی نیست! فقط خروجیِ اجرای یک برنامه در فرانکفورت است که مرورگر شما آن را نقاشی کرده است.</p>
+            <button>افزودن به سبد خرید</button>
+        </div>
+    </div>
+
+    <!-- کنترلرهای پایین برای تدریس -->
+    <div class="controls-bar glass-panel">
+        <button class="ctrl-btn" id="btnStep1" onclick="runStep1_DNS()">۱. پرسش از DNS</button>
+        <button class="ctrl-btn" id="btnStep2" onclick="runStep2_Request()">۲. ارسال درخواست به سرور</button>
+        <button class="ctrl-btn" id="btnStep3" onclick="runStep3_Response()">۳. اجرای برنامه و بازگشت کد</button>
+        <button class="ctrl-btn" id="btnSlowMo" onclick="toggleSlowMo()">🐢 حالت اسلوموشن: خاموش</button>
+        <button class="ctrl-btn" onclick="resetCamera()">🎯 تنظیم دوربین</button>
+    </div>
+
+    <!-- ایمپورت کردن کتابخانه Three.js -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // ۱. تنظیمات صحنه، دوربین و رندرر
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // تنظیم اولیه دوربین روبه‌روی ایران و اروپا
+        camera.position.set(14, 12, 18);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 12;
+        controls.maxDistance = 40;
+
+        // ۲. نورپردازی محیط
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0x38bdf8, 2.5);
+        dirLight.position.set(20, 15, 20);
+        scene.add(dirLight);
+
+        // ۳. ساخت کره زمین و اتمسفر
+        const GLOBE_RADIUS = 8;
+        const globeGroup = new THREE.Group();
+        scene.add(globeGroup);
+
+        const textureLoader = new THREE.TextureLoader();
+        const earthMat = new THREE.MeshPhongMaterial({
+            color: 0x1e293b,
+            emissive: 0x090d16,
+            specular: 0x38bdf8,
+            shininess: 15,
+            wireframe: false
+        });
+
+        // بارگذاری تکسچر شبِ زمین (در صورت قطعی اینترنت، با شبکه Wireframe شیک کار می‌کند)
+        textureLoader.load(
+            'https://unpkg.com/three-globe/example/img/earth-night.jpg',
+            (texture) => {
+                earthMat.map = texture;
+                earthMat.color.setHex(0xffffff);
+                earthMat.needsUpdate = true;
+            },
+            undefined,
+            () => {
+                // حالت جایگزین آفلاین
+                earthMat.wireframe = true;
+                earthMat.color.setHex(0x0284c7);
+            }
+        );
+
+        const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+        const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+        globeGroup.add(earthMesh);
+
+        // هاله شبکه دور زمین برای حس سایبری
+        const gridGeo = new THREE.SphereGeometry(GLOBE_RADIUS + 0.03, 36, 18);
+        const gridMat = new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.08
+        });
+        globeGroup.add(new THREE.Mesh(gridGeo, gridMat));
+
+        // ستاره‌های پس‌زمینه
+        const starsGeo = new THREE.BufferGeometry();
+        const starPositions = [];
+        for(let i = 0; i < 1500; i++) {
+            starPositions.push(
+                (Math.random() - 0.5) * 200,
+                (Math.random() - 0.5) * 200,
+                (Math.random() - 0.5) * 200
+            );
+        }
+        starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.25, transparent: true, opacity: 0.7 });
+        scene.add(new THREE.Points(starsGeo, starsMat));
+
+        // ۴. تابع تبدیل طول و عرض جغرافیایی به مختصات سه‌بعدی (X, Y, Z)
+        function latLonToVector3(lat, lon, radius = GLOBE_RADIUS) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const z = (radius * Math.sin(phi) * Math.sin(theta));
+            const y = (radius * Math.cos(phi));
+            return new THREE.Vector3(x, y, z);
+        }
+
+        // ۵. تعریف نودها (شهرها و دیتاسنترها)
+        const nodes = {
+            tehran:    { name: 'تهران (کامپیوتر شما)', ip: 'Client: 5.160.24.11', lat: 35.6892, lon: 51.3890, color: 0x10b981 },
+            dubai:     { name: 'فجیره / دبی (سرور DNS)', ip: 'DNS: 8.8.8.8', lat: 25.2048, lon: 55.2708, color: 0xf59e0b },
+            istanbul:  { name: 'استانبول (گیت‌وی ترانزیت)', ip: 'Gateway Router', lat: 41.0082, lon: 28.9784, color: 0x64748b },
+            frankfurt: { name: 'فرانکفورت (دیتاسنتر مقصد)', ip: 'Server: 185.199.108.153', lat: 50.1109, lon: 8.6821, color: 0xef4444 },
+            newyork:   { name: 'نیویورک (بک‌آپ ابری)', ip: 'Cloud: 142.250.190.46', lat: 40.7128, lon: -74.0060, color: 0x8b5cf6 }
+        };
+
+        const labelsContainer = document.getElementById('labels-container');
+        const cityElements = [];
+
+        Object.keys(nodes).forEach(key => {
+            const node = nodes[key];
+            node.pos = latLonToVector3(node.lat, node.lon);
+
+            // ساخت نقطه درخشان روی کره
+            const markerGeo = new THREE.SphereGeometry(0.16, 16, 16);
+            const markerMat = new THREE.MeshBasicMaterial({ color: node.color });
+            const marker = new THREE.Mesh(markerGeo, markerMat);
+            marker.position.copy(node.pos);
+            globeGroup.add(marker);
+
+            // ساخت لیبل HTML برای هر شهر
+            const div = document.createElement('div');
+            div.className = 'city-label';
+            div.innerHTML = `${node.name}<span>${node.ip}</span>`;
+            labelsContainer.appendChild(div);
+            cityElements.push({ element: div, position: node.pos });
+        });
+
+        // ۶. رسم کابل‌های فیبر نوری بین شهرها
+        function createCableCurve(startPos, endPos, heightScale = 1.12) {
+            const midPoint = startPos.clone().add(endPos).multiplyScalar(0.5);
+            midPoint.normalize().multiplyScalar(GLOBE_RADIUS * heightScale);
+            return new THREE.QuadraticBezierCurve3(startPos, midPoint, endPos);
+        }
+
+        const cables = {
+            tehran_dubai: createCableCurve(nodes.tehran.pos, nodes.dubai.pos, 1.08),
+            dubai_tehran: createCableCurve(nodes.dubai.pos, nodes.tehran.pos, 1.08),
+            tehran_frankfurt: createCableCurve(nodes.tehran.pos, nodes.frankfurt.pos, 1.18),
+            frankfurt_tehran: createCableCurve(nodes.frankfurt.pos, nodes.tehran.pos, 1.18),
+            frankfurt_ny: createCableCurve(nodes.frankfurt.pos, nodes.newyork.pos, 1.25)
+        };
+
+        // نمایش خطوط ثابت کابل‌ها روی زمین
+        Object.values(cables).forEach(curve => {
+            const points = curve.getPoints(50);
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+            globeGroup.add(new THREE.Line(lineGeo, lineMat));
+        });
+
+        // ۷. ساخت بسته نوری (Packet) متحرک
+        const packetGeo = new THREE.SphereGeometry(0.24, 16, 16);
+        const packetMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+        const packetMesh = new THREE.Mesh(packetGeo, packetMat);
+        packetMesh.visible = false;
+        globeGroup.add(packetMesh);
+
+        // متغیرهای انیمیشن بسته نوری
+        let activeCurve = null;
+        let packetProgress = 0;
+        let isSlowMo = false;
+        let onPacketArrive = null;
+
+        function launchPacket(curve, colorHex, callback) {
+            packetMat.color.setHex(colorHex);
+            activeCurve = curve;
+            packetProgress = 0;
+            packetMesh.visible = true;
+            onPacketArrive = callback;
+        }
+
+        // ۸. منطق مراحل تدریس (داستان‌گویی کلاسی)
+        const stepBadge = document.getElementById('stepBadge');
+        const storyTitle = document.getElementById('storyTitle');
+        const storyDesc = document.getElementById('storyDesc');
+        const packetInfo = document.getElementById('packetInfo');
+        const inspectorPanel = document.getElementById('inspectorPanel');
+        const terminalBox = document.getElementById('terminalBox');
+        const renderedPreview = document.getElementById('renderedPreview');
+
+        function highlightBtn(btnId) {
+            document.querySelectorAll('.ctrl-btn').forEach(b => {
+                if(b.id !== 'btnSlowMo') b.classList.remove('active');
+            });
+            if(btnId) document.getElementById(btnId).classList.add('active');
+        }
+
+        // مرحله اول: DNS
+        window.runStep1_DNS = function(nextCallback) {
+            highlightBtn('btnStep1');
+            inspectorPanel.style.display = 'none';
+            const url = document.getElementById('urlInput').value;
+
+            stepBadge.innerText = 'مرحله ۱ از ۳ : دفترچه تلفن اینترنت (DNS)';
+            storyTitle.innerText = 'پیدا کردن کد پستی سرور!';
+            storyDesc.innerText = 'کامپیوترها اسم سایت (مثل digikala.com) را نمی‌فهمند! مرورگر شما اول یک بسته نوری به نزدیک‌ترین سرور DNS می‌فرستد تا بپرسد: «کد پستی (IP) این سایت چیست؟»';
+            packetInfo.style.borderColor = '#f59e0b';
+            packetInfo.innerText = `[DNS Query Sent]\nFrom: Tehran (5.160.24.11)\nTo: DNS Server (8.8.8.8)\nQuestion: Where is "${url}"?`;
+
+            launchPacket(cables.tehran_dubai, 0xf59e0b, () => {
+                packetInfo.innerText = `[DNS Response Received!]\nDomain found!\nTarget IP: 185.199.108.153 (Frankfurt DataCenter)`;
+                launchPacket(cables.dubai_tehran, 0xf59e0b, () => {
+                    if(typeof nextCallback === 'function') setTimeout(nextCallback, 500);
+                });
+            });
+        };
+
+        // مرحله دوم: ارسال درخواست HTTP
+        window.runStep2_Request = function(nextCallback) {
+            highlightBtn('btnStep2');
+            inspectorPanel.style.display = 'none';
+            const url = document.getElementById('urlInput').value;
+
+            stepBadge.innerText = 'مرحله ۲ از ۳ : سفر به فرانکفورت (HTTP Request)';
+            storyTitle.innerText = 'سفارش دادن به کامپیوترِ آن سر دنیا';
+            storyDesc.innerText = 'حالا که آدرس IP را داریم، مرورگر یک «درخواست رسمی» از طریق کابل‌های فیبر نوری به دیتاسنتر فرانکفورت می‌فرستد: «لطفاً برنامه صفحه اصلی را اجرا کن و خروجی‌اش را به من بده!»';
+            packetInfo.style.borderColor = '#38bdf8';
+            packetInfo.innerText = `[HTTP GET Request]\nFrom: 5.160.24.11 (Tehran)\nTo: 185.199.108.153 (Frankfurt)\nMethod: GET ${url}\nBrowser: Chrome/122.0`;
+
+            launchPacket(cables.tehran_frankfurt, 0x38bdf8, () => {
+                // وقتی بسته به فرانکفورت رسید، پنل سرور باز شود
+                inspectorPanel.style.display = 'flex';
+                renderedPreview.style.display = 'none';
+                terminalBox.innerHTML = `> [Server Frankfurt] Packet received from Tehran!<br>> Running backend program (Python/Node.js)...<br>> Fetching prices from Database...<br>> Generating HTML/CSS output...<br><span style="color:#f59e0b;">> Ready to send back!</span>`;
+                if(typeof nextCallback === 'function') setTimeout(nextCallback, 1200);
+            });
+        };
+
+        // مرحله سوم: بازگشت کد و رندر شدن
+        window.runStep3_Response = function() {
+            highlightBtn('btnStep3');
+            inspectorPanel.style.display = 'flex';
+            renderedPreview.style.display = 'none';
+
+            stepBadge.innerText = 'مرحله ۳ از ۳ : دریافت کد و نقاشی صفحه (Rendering)';
+            storyTitle.innerText = 'وب یعنی: قرض گرفتن خروجی!';
+            storyDesc.innerText = 'سرور فرانکفورت برنامه‌اش را اجرا کرد و نتیجه‌اش (یک متن ساده شامل کدهای HTML و CSS) را به تهران شلیک می‌کند. مرورگر شما این کدها را می‌خواند و تبدیل به تصویر و دکمه می‌کند!';
+            packetInfo.style.borderColor = '#10b981';
+            packetInfo.innerText = `[HTTP 200 OK - Response]\nPayload: index.html + style.css\nSize: 42 KB\nTime elapsed: 145 ms`;
+
+            launchPacket(cables.frankfurt_tehran, 0x10b981, () => {
+                terminalBox.innerHTML = `<!-- کدی که به مرورگر شما رسید -->\n&lt;html&gt;\n  &lt;body&gt;\n    &lt;h3&gt;فروشگاه اینترنتی&lt;/h3&gt;\n    &lt;button&gt;افزودن به سبد&lt;/button&gt;\n  &lt;/body&gt;\n&lt;/html&gt;`;
+                renderedPreview.style.display = 'flex';
+            });
+        };
+
+        // اجرای خودکار هر ۳ مرحله پشت سر هم با زدن دکمه Enter
+        window.startFullJourney = function() {
+            window.runStep1_DNS(() => {
+                window.runStep2_Request(() => {
+                    window.runStep3_Response();
+                });
+            });
+        };
+
+        // دکمه اسلوموشن برای تدریس راحت‌تر
+        window.toggleSlowMo = function() {
+            isSlowMo = !isSlowMo;
+            const btn = document.getElementById('btnSlowMo');
+            btn.innerText = isSlowMo ? '🐢 حالت اسلوموشن: روشن' : '🐢 حالت اسلوموشن: خاموش';
+            btn.classList.toggle('active', isSlowMo);
+        };
+
+        // بازگرداندن دوربین به زاویه دید ایران و اروپا
+        window.resetCamera = function() {
+            camera.position.set(14, 12, 18);
+            controls.target.set(0, 0, 0);
+        };
+
+        // ۹. حلقه اصلی انیمیشن (۶۰ فریم بر ثانیه)
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            // حرکت بسته نوری روی منحنی کابل
+            if (activeCurve && packetMesh.visible) {
+                const speed = isSlowMo ? 0.003 : 0.014;
+                packetProgress += speed;
+
+                if (packetProgress >= 1) {
+                    packetMesh.visible = false;
+                    activeCurve = null;
+                    if (onPacketArrive) onPacketArrive();
+                } else {
+                    const currentPos = activeCurve.getPointAt(packetProgress);
+                    packetMesh.position.copy(currentPos);
+                }
+            }
+
+            // آپدیت کردن موقعیت لیبل‌های شهرها روی صفحه دو بعدی
+            cityElements.forEach(item => {
+                const worldPos = item.position.clone();
+                // بررسی اینکه آیا شهر در نیمکره رو به دوربین است یا پشت زمین
+                const camToEarth = camera.position.clone().normalize();
+                const cityNormal = worldPos.clone().normalize();
+                
+                if (camToEarth.dot(cityNormal) > 0.15) {
+                    worldPos.project(camera);
+                    const x = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (-(worldPos.y * 0.5) + 0.5) * window.innerHeight;
+                    item.element.style.left = `${x}px`;
+                    item.element.style.top = `${y}px`;
+                    item.element.style.display = 'block';
+                } else {
+                    item.element.style.display = 'none';
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // واکنش‌گرا بودن در صورت تغییر سایز پنجره یا پروژکتور
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
