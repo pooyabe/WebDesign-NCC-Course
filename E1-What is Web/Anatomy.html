@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>کالبدشکافی وب</title>
+  <style id="custom-css">
+    body { font-family: sans-serif; background: #0f172a; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { background: #1e293b; border: 1px solid #38bdf8; padding: 24px; border-radius: 12px; width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .btn { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: transform 0.2s; }
+    .btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <!-- کنترل‌های استاد -->
+  <div style="position: absolute; top: 20px; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 8px; border: 1px solid #475569;">
+    <label><input type="checkbox" id="toggleCSS" checked> فعال بودن CSS (لباس و استایل)</label>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <label><input type="checkbox" id="toggleJS" checked> فعال بودن JS (عصب و منطق)</label>
+  </div>
+
+  <!-- المان نمایشی -->
+  <div class="card" id="demoCard">
+    <h2 id="cardTitle">یک کارت در وب</h2>
+    <p id="cardDesc">این یک المان استاندارد وب است.</p>
+    <button class="btn" id="actionBtn">کلیک کنید!</button>
+  </div>
+
+  <script>
+    const cssTag = document.getElementById('custom-css');
+    const cssContent = cssTag.innerHTML;
+    const toggleCSS = document.getElementById('toggleCSS');
+    const toggleJS = document.getElementById('toggleJS');
+    const btn = document.getElementById('actionBtn');
+    const title = document.getElementById('cardTitle');
+
+    // قطع و وصل کردن استایل (CSS)
+    toggleCSS.addEventListener('change', (e) => {
+      cssTag.innerHTML = e.target.checked ? cssContent : '';
+    });
+
+    // عملکرد دکمه (JavaScript)
+    let clickCount = 0;
+    btn.addEventListener('click', () => {
+      if (!toggleJS.checked) {
+        alert("جاوااسکریپت غیرفعال است! هیچ رویدادی اجرا نمی‌شود.");
+        return;
+      }
+      clickCount++;
+      title.innerText = `کلیک شد! (${clickCount})`;
+      btn.style.backgroundColor = clickCount % 2 === 0 ? '#0284c7' : '#10b981';
+    });
+  </script>
+</body>
+</html>
