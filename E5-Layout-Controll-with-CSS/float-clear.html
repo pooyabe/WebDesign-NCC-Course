@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Float و Clear</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.8;
+            margin: 30px;
+            background: #f5f5f5;
+        }
+
+        section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+        }
+
+        .area {
+            background: #eee;
+            padding: 10px;
+            min-height: 115px;
+        }
+
+        .card {
+            width: 110px;
+            height: 75px;
+            padding: 8px;
+            margin: 5px;
+            background: #dcecff;
+            border: 2px solid steelblue;
+            text-align: center;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .none {
+            float: none;
+        }
+
+        .footer {
+            background: #ffe7c2;
+            padding: 12px;
+            border: 2px solid #b77b24;
+        }
+
+        .clearfix {
+            clear: both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Float و Clear</h1>
+
+    <section>
+        <h2>۱. float: left</h2>
+
+        <div class="area">
+            <div class="card left">left 1</div>
+            <div class="card left">left 2</div>
+            <div class="card left">left 3</div>
+
+            <div class="clearfix"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>۲. float: right</h2>
+
+        <div class="area">
+            <div class="card right">right 1</div>
+            <div class="card right">right 2</div>
+            <div class="card right">right 3</div>
+
+            <div class="clearfix"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>۳. float: none</h2>
+
+        <div class="area">
+            <div class="card none">none 1</div>
+            <div class="card none">none 2</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>۴. مشکل Float و Footer</h2>
+
+        <div class="area">
+            <div class="card left">کارت ۱</div>
+            <div class="card left">کارت ۲</div>
+            <div class="card left">کارت ۳</div>
+        </div>
+
+        <div class="footer">
+            Footer بدون clear؛
+            ممکن است کنار کارت‌ها قرار بگیرد.
+        </div>
+    </section>
+
+    <section>
+        <h2>۵. clear: both</h2>
+
+        <div class="area">
+            <div class="card left">کارت ۱</div>
+            <div class="card left">کارت ۲</div>
+            <div class="card left">کارت ۳</div>
+
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="footer clearfix">
+            Footer با clear: both؛
+            زیر عناصر شناور قرار می‌گیرد.
+        </div>
+    </section>
+
+    <section>
+        <h2>۶. clear: left / right / both</h2>
+
+        <p>
+            left فقط شناورهای چپ،
+            right فقط شناورهای راست و
+            both هر دو سمت را پاک می‌کند.
+        </p>
+
+        <div class="area">
+            <div class="card left">float left</div>
+            <div class="card right">float right</div>
+
+            <div style="clear:left; background:#dff2df; padding:8px">
+                clear: left
+            </div>
+
+            <div style="clear:both; background:#ffe7c2; padding:8px">
+                clear: both
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
