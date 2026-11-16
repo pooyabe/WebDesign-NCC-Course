@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Clear</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .float-box {
+      width: 120px;
+      height: 80px;
+      margin: 10px;
+      color: white;
+      text-align: center;
+      line-height: 80px;
+    }
+
+    .left {
+      float: left;
+      background: #cc0000;
+    }
+
+    .right {
+      float: right;
+      background: #0066cc;
+    }
+
+    .cleared {
+      background: #ffcc66;
+      padding: 15px;
+      margin: 10px 0;
+      border: 2px solid #cc9900;
+    }
+
+    .clear-left {
+      clear: left;
+    }
+
+    .clear-right {
+      clear: right;
+    }
+
+    .clear-both {
+      clear: both;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS <code>clear</code></h1>
+  <p>
+    The <code>clear</code> property tells an element: "Do not allow floated elements beside me on the specified side."
+  </p>
+
+  <h2>1. <code>clear: left;</code></h2>
+  <div class="float-box left">Float Left</div>
+  <p>This paragraph wraps around the red box.</p>
+  <p class="cleared clear-left">
+    I have <code>clear: left;</code>, so I move below the red floated box instead of wrapping beside it.
+  </p>
+
+  <h2>2. <code>clear: right;</code></h2>
+  <div class="float-box right">Float Right</div>
+  <p>This paragraph wraps around the blue box.</p>
+  <p class="cleared clear-right">
+    I have <code>clear: right;</code>, so I drop below the blue floated box on the right.
+  </p>
+
+  <h2>3. <code>clear: both;</code></h2>
+  <div class="float-box left">Float Left</div>
+  <div class="float-box right">Float Right</div>
+  <p class="cleared clear-both">
+    I have <code>clear: both;</code>, so I start below all floated elements, both on the left and the right.
+  </p>
+
+  <p>
+    <strong>Remember:</strong> Use <code>clear</code> when you want content to stop wrapping around floats and start on a fresh line.
+  </p>
+</body>
+</html>

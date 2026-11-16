@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Box-Sizing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .box {
+      width: 300px;
+      height: 100px;
+      padding: 20px;
+      border: 5px solid;
+      margin-bottom: 20px;
+    }
+
+    /* Default value */
+    .content-box {
+      box-sizing: content-box;
+      background-color: #ffcccc;
+      border-color: #cc0000;
+    }
+
+    /* Recommended value */
+    .border-box {
+      box-sizing: border-box;
+      background-color: #ccffcc;
+      border-color: #006600;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS <code>box-sizing</code></h1>
+  <p>
+    <code>box-sizing</code> controls how the browser calculates the total size of an element.
+  </p>
+
+  <h2>1. <code>box-sizing: content-box;</code> (default)</h2>
+  <p>
+    Width and height apply only to the content area. Padding and border are added on top, making the element larger than the width you set.
+  </p>
+  <div class="box content-box">
+    I am <code>300px</code> wide on content, but my total width is <code>350px</code> (300 + 20 + 20 + 5 + 5).
+  </div>
+
+  <h2>2. <code>box-sizing: border-box;</code></h2>
+  <p>
+    Width and height include padding and border, so the visible box matches the number you set.
+  </p>
+  <div class="box border-box">
+    I am exactly <code>300px</code> wide total. Padding and border are counted inside.
+  </div>
+
+  <p>
+    <strong>Tip:</strong> Most developers use <code>* { box-sizing: border-box; }</code> to make layouts easier.
+  </p>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .block {
+      display: block;
+      background: #ffcccc;
+      margin: 5px 0;
+    }
+
+    .inline {
+      display: inline;
+      background: #ccffcc;
+      padding: 0 5px;
+    }
+
+    .inline-block {
+      display: inline-block;
+      width: 120px;
+      height: 60px;
+      background: #ccccff;
+      margin: 5px;
+      text-align: center;
+      line-height: 60px;
+    }
+
+    .none {
+      display: none;
+    }
+
+    .flex {
+      display: flex;
+      gap: 10px;
+      background: #ffffcc;
+      padding: 10px;
+    }
+
+    .flex-item {
+      background: #ffcc66;
+      padding: 10px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      background: #f0f0f0;
+      padding: 10px;
+    }
+
+    .grid-item {
+      background: #99ccff;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS <code>display</code></h1>
+  <p>
+    The <code>display</code> property decides how an element is placed on the page and how it interacts with nearby elements.
+  </p>
+
+  <h2>1. <code>display: block;</code></h2>
+  <p>Block elements take up the full width and start on a new line.</p>
+  <span class="block">I am an inline element forced to be block.</span>
+  <span class="block">I also take the whole line.</span>
+
+  <h2>2. <code>display: inline;</code></h2>
+  <p>Inline elements sit next to each other inside a line and ignore width/height.</p>
+  <div class="inline">Inline 1</div>
+  <div class="inline">Inline 2</div>
+  <div class="inline">Inline 3</div>
+
+  <h2>3. <code>display: inline-block;</code></h2>
+  <p>Like inline, but you can set width and height.</p>
+  <div class="inline-block">Box A</div>
+  <div class="inline-block">Box B</div>
+  <div class="inline-block">Box C</div>
+
+  <h2>4. <code>display: none;</code></h2>
+  <p>The element below is hidden and does not take up space.</p>
+  <div class="none">You cannot see me.</div>
+
+  <h2>5. <code>display: flex;</code></h2>
+  <p>Flexbox arranges children in a row or column.</p>
+  <div class="flex">
+    <div class="flex-item">1</div>
+    <div class="flex-item">2</div>
+    <div class="flex-item">3</div>
+  </div>
+
+  <h2>6. <code>display: grid;</code></h2>
+  <p>Grid places children in rows and columns.</p>
+  <div class="grid">
+    <div class="grid-item">A</div>
+    <div class="grid-item">B</div>
+    <div class="grid-item">C</div>
+    <div class="grid-item">D</div>
+    <div class="grid-item">E</div>
+    <div class="grid-item">F</div>
+  </div>
+</body>
+</html>

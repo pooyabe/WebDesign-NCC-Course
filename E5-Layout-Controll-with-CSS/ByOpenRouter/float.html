@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Float</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .float-box {
+      width: 150px;
+      height: 100px;
+      margin: 10px;
+      padding: 10px;
+      color: white;
+      text-align: center;
+      line-height: 100px;
+    }
+
+    .left {
+      float: left;
+      background: #cc0000;
+    }
+
+    .right {
+      float: right;
+      background: #0066cc;
+    }
+
+    .no-float {
+      float: none;
+      background: #009900;
+      color: white;
+      padding: 10px;
+    }
+
+    .article {
+      border: 1px dashed #999;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    .clearfix::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS <code>float</code></h1>
+  <p>
+    <code>float</code> moves an element to the left or right and lets text wrap around it. It was originally made for magazine-style text wrapping.
+  </p>
+
+  <h2>1. <code>float: left;</code></h2>
+  <div class="article clearfix">
+    <div class="float-box left">Float Left</div>
+    <p>
+      This text wraps around the red box because the box is floated to the left. The inline content of this paragraph moves to the right side of the floated element.
+    </p>
+  </div>
+
+  <h2>2. <code>float: right;</code></h2>
+  <div class="article clearfix">
+    <div class="float-box right">Float Right</div>
+    <p>
+      This text wraps around the blue box because the box is floated to the right. Notice how the paragraph content flows on the left side of the floated box.
+    </p>
+  </div>
+
+  <h2>3. <code>float: none;</code> (default)</h2>
+  <div class="article">
+    <div class="no-float">I am not floated.</div>
+    <p>
+      Without floating, this element sits in the normal document flow and the paragraph appears below it instead of wrapping around it.
+    </p>
+  </div>
+
+  <p>
+    <strong>Note:</strong> Modern layouts usually use <code>display: flex</code> or <code>display: grid</code> instead of floats.
+  </p>
+</body>
+</html>
