@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive CSS Properties Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #38bdf8;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      background: #0f172a;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    /* Progress bar */
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #f472b6, #38bdf8, #34d399, #fbbf24);
+      width: 25%;
+      z-index: 200;
+      transition: width 0.4s ease;
+    }
+
+    /* Navigation dots */
+    .nav-dots {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 200;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .nav-dot.active {
+      background: #fff;
+      transform: scale(1.4);
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
+    }
+
+    /* Prev / Next buttons */
+    .nav-btn {
+      position: fixed;
+      bottom: 28px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(1.08);
+    }
+
+    .nav-btn.prev { left: 28px; }
+    .nav-btn.next { right: 28px; }
+
+    /* Slides */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      position: relative;
+      scroll-snap-align: start;
+    }
+
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.9;
+    }
+
+    .bg-box { background: radial-gradient(circle at 20% 30%, #7c3aed, #0f172a 60%); }
+    .bg-display { background: radial-gradient(circle at 80% 20%, #059669, #0f172a 60%); }
+    .bg-float { background: radial-gradient(circle at 30% 80%, #ea580c, #0f172a 60%); }
+    .bg-clear { background: radial-gradient(circle at 70% 70%, #0891b2, #0f172a 60%); }
+
+    .card {
+      width: min(1150px, 92vw);
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 44px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 44px;
+      animation: fadeIn 0.8s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .card { grid-template-columns: 1fr; gap: 28px; padding: 28px; }
+      .nav-dots { display: none; }
+    }
+
+    .slide-title {
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 800;
+      margin: 0 0 10px;
+      line-height: 1.1;
+    }
+
+    .slide-desc {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 1.05rem;
+      margin: 0 0 28px;
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .control-group {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .control-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select option { color: #111; }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .range-value {
+      min-width: 52px;
+      text-align: right;
+      font-family: 'Fira Code', monospace;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    .preview {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 20px;
+      padding: 24px;
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-stage {
+      flex: 1;
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.22);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .preview-label {
+      margin-top: 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      min-height: 1.6em;
+    }
+
+    /* Box-sizing preview */
+    #boxPreview {
+      background: linear-gradient(135deg, #f472b6, #a78bfa);
+      color: #fff;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 700;
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.9);
+      transition: all 0.25s ease;
+    }
+
+    /* Display preview */
+    #displayContainer {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .display-item {
+      width: 80px;
+      height: 60px;
+      line-height: 60px;
+      text-align: center;
+      font-weight: 700;
+      border-radius: 10px;
+      margin: 6px;
+    }
+
+    .display-item:nth-child(1) { background: #f87171; }
+    .display-item:nth-child(2) { background: #fbbf24; }
+    .display-item:nth-child(3) { background: #34d399; }
+    .display-item:nth-child(4) { background: #60a5fa; }
+    .display-item:nth-child(5) { background: #a78bfa; }
+
+    /* Float preview */
+    #floatBox {
+      width: 160px;
+      height: 120px;
+      margin: 10px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #fb923c, #f43f5e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    #floatText {
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+    }
+
+    /* Clear preview */
+    .clear-floated {
+      width: 130px;
+      height: 90px;
+      margin: 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .cf-left {
+      float: left;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .cf-right {
+      float: right;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    #clearTarget {
+      background: rgba(255, 255, 255, 0.16);
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 14px;
+      color: #fff;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress"></div>
+
+  <div class="nav-dots">
+    <div class="nav-dot active" data-target="boxSizing"></div>
+    <div class="nav-dot" data-target="display"></div>
+    <div class="nav-dot" data-target="float"></div>
+    <div class="nav-dot" data-target="clear"></div>
+  </div>
+
+  <button class="nav-btn prev" aria-label="Previous slide">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+  <button class="nav-btn next" aria-label="Next slide">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
+
+  <!-- BOX-SIZING SLIDE -->
+  <section class="slide" id="boxSizing">
+    <div class="slide-bg bg-box"></div>
+    <div class="card">
+      <div class="content">
+        <h1 class="slide-title">box-sizing</h1>
+        <p class="slide-desc">
+          Decide whether padding and border are counted inside the width you set, or added on top of it.
+        </p>
+        <div class="controls">
+          <div class="control-group">
+            <label for="boxSizingSelect">Box-sizing value</label>
+            <select id="boxSizingSelect">
+              <option value="content-box">content-box</option>
+              <option value="border-box" selected>border-box</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="boxWidth">Width</label>
+            <div class="range-wrap">
+              <input type="range" id="boxWidth" min="120" max="420" value="280">
+              <span class="range-value" id="boxWidthValue">280px</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="boxPadding">Padding</label>
+            <div class="range-wrap">
+              <input type="range" id="boxPadding" min="0" max="70" value="24">
+              <span class="range-value" id="boxPaddingValue">24px</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="boxBorder">Border width</label>
+            <div class="range-wrap">
+              <input type="range" id="boxBorder" min="0" max="30" value="8">
+              <span class="range-value" id="boxBorderValue">8px</span>
+            </div>
+          </div>
+          <span class="badge">Rendered size updates live</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="preview-stage">
+          <div id="boxPreview">I am the box</div>
+        </div>
+        <div class="preview-label" id="boxSizingLabel">Rendered: —</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISPLAY SLIDE -->
+  <section class="slide" id="display">
+    <div class="slide-bg bg-display"></div>
+    <div class="card">
+      <div class="content">
+        <h1 class="slide-title">display</h1>
+        <p class="slide-desc">
+          Control how an element behaves in the document flow and how its children are laid out.
+        </p>
+        <div class="controls">
+          <div class="control-group">
+            <label for="displaySelect">Display value</label>
+            <select id="displaySelect">
+              <option value="block" selected>block</option>
+              <option value="inline">inline</option>
+              <option value="inline-block">inline-block</option>
+            </select>
+          </div>
+          <p class="slide-desc" id="displayHint" style="margin-top:8px; font-size:0.95rem;">
+            Block items stack vertically and fill the available width.
+          </p>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="preview-stage">
+          <div id="displayContainer">
+            <div class="display-item">A</div>
+            <div class="display-item">B</div>
+            <div class="display-item">C</div>
+            <div class="display-item">D</div>
+            <div class="display-item">E</div>
+          </div>
+        </div>
+        <div class="preview-label" id="displayLabel">display: block;</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOAT SLIDE -->
+  <section class="slide" id="float">
+    <div class="slide-bg bg-float"></div>
+    <div class="card">
+      <div class="content">
+        <h1 class="slide-title">float</h1>
+        <p class="slide-desc">
+          Move an element to the left or right so that surrounding text can wrap around it.
+        </p>
+        <div class="controls">
+          <div class="control-group">
+            <label for="floatSelect">Float value</label>
+            <select id="floatSelect">
+              <option value="none" selected>none</option>
+              <option value="left">left</option>
+              <option value="right">right</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="floatWidth">Float box width</label>
+            <div class="range-wrap">
+              <input type="range" id="floatWidth" min="100" max="280" value="160">
+              <span class="range-value" id="floatWidthValue">160px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="preview-stage">
+          <div id="floatBox">Float me</div>
+          <p id="floatText">
+            This is a paragraph of text. When the colored box is floated, these words will wrap around it on the opposite side. Try switching between left, right, and none to see the text flow change in real time.
+          </p>
+        </div>
+        <div class="preview-label" id="floatLabel">float: none;</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLEAR SLIDE -->
+  <section class="slide" id="clear">
+    <div class="slide-bg bg-clear"></div>
+    <div class="card">
+      <div class="content">
+        <h1 class="slide-title">clear</h1>
+        <p class="slide-desc">
+          Tell an element to drop below floated elements on one or both sides.
+        </p>
+        <div class="controls">
+          <div class="control-group">
+            <label for="clearSelect">Clear value</label>
+            <select id="clearSelect">
+              <option value="none" selected>none</option>
+              <option value="left">left</option>
+              <option value="right">right</option>
+              <option value="both">both</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="preview-stage">
+          <div class="clear-floated cf-left">Float Left</div>
+          <div class="clear-floated cf-right">Float Right</div>
+          <div id="clearTarget">I respect the clear value above.</div>
+        </div>
+        <div class="preview-label" id="clearLabel">clear: none;</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // ===== Slide navigation =====
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.nav-dot');
+    const progress = document.getElementById('progress');
+    const prevBtn = document.querySelector('.nav-btn.prev');
+    const nextBtn = document.querySelector('.nav-btn.next');
+    let currentIndex = 0;
+
+    function goToSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= slides.length) index = slides.length - 1;
+      slides[index].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updateNav(index) {
+      currentIndex = index;
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      progress.style.width = ((index + 1) / slides.length * 100) + '%';
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const targetId = dot.dataset.target;
+        const target = document.getElementById(targetId);
+        target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        goToSlide(currentIndex + 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToSlide(currentIndex - 1);
+      }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = Array.from(slides).indexOf(entry.target);
+          updateNav(index);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(slide => observer.observe(slide));
+
+    // ===== Box-sizing interactivity =====
+    const boxSizingSelect = document.getElementById('boxSizingSelect');
+    const boxWidth = document.getElementById('boxWidth');
+    const boxPadding = document.getElementById('boxPadding');
+    const boxBorder = document.getElementById('boxBorder');
+    const boxPreview = document.getElementById('boxPreview');
+    const boxSizingLabel = document.getElementById('boxSizingLabel');
+
+    function updateBoxSizing() {
+      boxPreview.style.boxSizing = boxSizingSelect.value;
+      boxPreview.style.width = boxWidth.value + 'px';
+      boxPreview.style.padding = boxPadding.value + 'px';
+      boxPreview.style.borderWidth = boxBorder.value + 'px';
+
+      document.getElementById('boxWidthValue').textContent = boxWidth.value + 'px';
+      document.getElementById('boxPaddingValue').textContent = boxPadding.value + 'px';
+      document.getElementById('boxBorderValue').textContent = boxBorder.value + 'px';
+
+      const rect = boxPreview.getBoundingClientRect();
+      boxSizingLabel.textContent = `Rendered size: ${Math.round(rect.width)}px × ${Math.round(rect.height)}px | box-sizing: ${boxSizingSelect.value};`;
+    }
+
+    [boxSizingSelect, boxWidth, boxPadding, boxBorder].forEach(el => {
+      el.addEventListener('input', updateBoxSizing);
+    });
+    window.addEventListener('resize', updateBoxSizing);
+    updateBoxSizing();
+
+    // ===== Display interactivity =====
+    const displaySelect = document.getElementById('displaySelect');
+    const displayContainer = document.getElementById('displayContainer');
+    const displayLabel = document.getElementById('displayLabel');
+    const displayHint = document.getElementById('displayHint');
+
+    const displayHints = {
+      block: 'Block items stack vertically and fill the available width.',
+      inline: 'Inline items sit next to each other in a line and ignore width/height.',
+      'inline-block': 'Inline-block items sit in a line but still respect width and height.'
+    };
+
+    const displayItems = document.querySelectorAll('.display-item');
+
+    function applyDisplay() {
+      const val = displaySelect.value;
+      displayItems.forEach(item => {
+        item.style.display = val;
+        if (val === 'inline') {
+          item.style.width = 'auto';
+          item.style.height = 'auto';
+          item.style.lineHeight = '1.4';
+          item.style.padding = '10px 16px';
+          item.style.margin = '0 4px';
+          item.style.verticalAlign = 'middle';
+        } else {
+          item.style.width = '';
+          item.style.height = '';
+          item.style.lineHeight = '';
+          item.style.padding = '';
+          item.style.margin = '';
+          item.style.verticalAlign = '';
+        }
+      });
+      displayLabel.textContent = `display: ${val};`;
+      displayHint.textContent = displayHints[val];
+    }
+
+    displaySelect.addEventListener('change', applyDisplay);
+    applyDisplay();
+
+    // ===== Float interactivity =====
+    const floatSelect = document.getElementById('floatSelect');
+    const floatWidth = document.getElementById('floatWidth');
+    const floatBox = document.getElementById('floatBox');
+    const floatLabel = document.getElementById('floatLabel');
+
+    function updateFloat() {
+      const val = floatSelect.value;
+      floatBox.style.float = val;
+      floatBox.style.width = floatWidth.value + 'px';
+      document.getElementById('floatWidthValue').textContent = floatWidth.value + 'px';
+      floatLabel.textContent = `float: ${val}; width: ${floatWidth.value}px;`;
+    }
+
+    floatSelect.addEventListener('change', updateFloat);
+    floatWidth.addEventListener('input', updateFloat);
+    updateFloat();
+
+    // ===== Clear interactivity =====
+    const clearSelect = document.getElementById('clearSelect');
+    const clearTarget = document.getElementById('clearTarget');
+    const clearLabel = document.getElementById('clearLabel');
+
+    clearSelect.addEventListener('change', () => {
+      const val = clearSelect.value;
+      clearTarget.style.clear = val;
+      clearLabel.textContent = `clear: ${val};`;
+    });
+  </script>
+</body>
+</html>
