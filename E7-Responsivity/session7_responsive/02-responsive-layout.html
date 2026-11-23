@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>آزمایشگاه Responsive Layout</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#192538;--line:#34455e;--text:#edf3fb;--muted:#aebbd0;--accent:#6dd6bd;--blue:#84b7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0%,#283e5c 0,transparent 32%),var(--bg);color:var(--text);font-family:Tahoma,"Vazirmatn",sans-serif;line-height:1.8}.wrap{max-width:1450px;margin:auto;padding:26px}.top{margin-bottom:22px}.eyebrow{color:var(--accent);font-size:13px;font-weight:bold}.top h1{margin:4px 0 6px;font-size:clamp(24px,3vw,36px)}.top p{margin:0;color:var(--muted);max-width:1000px}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--muted);font-size:12px;margin-top:10px}
+.grid{display:grid;grid-template-columns:minmax(270px,350px) minmax(0,1fr);gap:18px}.panel{background:linear-gradient(180deg,#1c2a3f,#172337);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 14px 40px #0003}.panel h2{font-size:19px;margin:0 0 16px}.control{margin-bottom:19px}.control-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:7px}.control label{font-size:14px;color:#d9e5f5}.value{font:700 14px ui-monospace,monospace;color:var(--accent);direction:ltr}input[type=range]{width:100%;accent-color:var(--accent)}select{width:100%;background:#101a29;color:var(--text);border:1px solid #455a77;border-radius:10px;padding:11px;font:inherit}.hint,.note{font-size:12px;color:var(--muted);margin-top:5px}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid #49617f;background:#263a55;color:var(--text);padding:9px 14px;border-radius:10px;font:inherit;cursor:pointer}.btn.primary{background:var(--accent);color:#10251f;border-color:var(--accent);font-weight:bold}
+.preview-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.preview-head h2{margin:0}.live{font-size:13px;padding:5px 11px;border-radius:999px;background:#243e4a;color:var(--accent);border:1px solid #32665e}.stage{background:#0c1421;border:1px dashed #536783;border-radius:14px;padding:14px;overflow:auto;min-height:570px}.stage iframe{display:block;border:0;border-radius:9px;background:white;box-shadow:0 12px 28px #0007;max-width:none}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.metric{background:#111d2d;border:1px solid var(--line);border-radius:12px;padding:12px}.metric small{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font:700 18px ui-monospace,monospace;direction:ltr;color:var(--blue);margin-top:3px}.codebox{margin-top:16px}.codebox h3{font-size:15px;margin:0 0 8px}.codebox pre{direction:ltr;text-align:left;white-space:pre;overflow:auto;margin:0;padding:15px;background:#0b1320;border:1px solid #2d4059;border-radius:12px;color:#d7e5f7;font:13px/1.7 ui-monospace,Consolas,monospace}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.wrap{padding:15px}}
+</style>
+</head>
+<body><div class="wrap">
+<header class="top"><div class="eyebrow">کارگاه تعاملی CSS · بخش ۲</div><h1>Responsive Layout با Flexbox و Media Query</h1><p>در این نمونه، کارت‌ها و منو در فضای باریک روی هم قرار می‌گیرند و با عبور از Breakpoint به چیدمان افقی تغییر می‌کنند. عرض قاب و نقطهٔ شکست را عوض کن و رفتار واقعی CSS را ببین.</p><span class="tag">Flexbox + Media Query · فایل مستقل</span></header>
+<main class="grid">
+<section class="panel"><h2>تنظیمات چیدمان</h2>
+<div class="control"><div class="control-head"><label for="width">عرض Viewport</label><output class="value" id="widthOut">390px</output></div><input id="width" type="range" min="320" max="1280" step="10" value="390"></div>
+<div class="control"><div class="control-head"><label for="breakpoint">Breakpoint</label><output class="value" id="bpOut">720px</output></div><input id="breakpoint" type="range" min="420" max="1050" step="10" value="720"></div>
+<div class="control"><div class="control-head"><label for="gap">فاصلهٔ بین کارت‌ها (gap)</label><output class="value" id="gapOut">12px</output></div><input id="gap" type="range" min="4" max="32" step="2" value="12"></div>
+<div class="control"><div class="control-head"><label for="mode">رفتار کارت‌ها</label></div><select id="mode"><option value="switch">ستونی در موبایل، ردیفی در عرض بیشتر</option><option value="always-column">همیشه ستونی</option><option value="wrap">ردیفی با قابلیت رفتن به سطر بعد</option></select></div>
+<div class="actions"><button class="btn primary" id="reset">Reset</button><button class="btn" id="phone">موبایل 390px</button><button class="btn" id="wide">نمای عریض 1000px</button></div>
+<p class="note">برای تأکید آموزشی، ابتدا Breakpoint را از عرض فعلی پایین‌تر و سپس بالاتر ببر. تغییر چیدمان دقیقاً هنگام برقرار شدن شرط رخ می‌دهد.</p></section>
+<section class="panel"><div class="preview-head"><h2>صفحهٔ نمونه</h2><span class="live" id="state">چیدمان موبایل</span></div>
+<div class="stage"><iframe id="demo" title="پیش‌نمایش Responsive Layout" width="390" height="540"></iframe></div>
+<div class="metrics"><div class="metric"><small>عرض قاب</small><strong id="mWidth">390px</strong></div><div class="metric"><small>Breakpoint</small><strong id="mBp">720px</strong></div><div class="metric"><small>وضعیت قانون</small><strong id="mState">غیرفعال</strong></div></div>
+<div class="codebox"><h3>کد CSS مطابق تنظیمات فعلی</h3><pre id="code"></pre></div></section>
+</main><div class="footer">پیش‌نمایش داخل iframe مستقل است؛ بنابراین Media Query با عرض شبیه‌سازی‌شده سنجیده می‌شود، نه عرض پنجرهٔ اصلی ابزار.</div></div>
+<script>
+(() => {
+ const $=id=>document.getElementById(id), width=$('width'), bp=$('breakpoint'), gap=$('gap'), mode=$('mode'), frame=$('demo');
+ function update(){
+  const w=+width.value,b=+bp.value,g=+gap.value,m=mode.value,wide=w>=b;
+  $('widthOut').textContent=w+'px';$('bpOut').textContent=b+'px';$('gapOut').textContent=g+'px';$('mWidth').textContent=w+'px';$('mBp').textContent=b+'px';$('mState').textContent=wide?'فعال':'غیرفعال';
+  $('state').textContent=m==='always-column'?'همیشه ستونی':m==='wrap'?'Flex-wrap':wide?'چیدمان عریض':'چیدمان موبایل';
+  let css;
+  if(m==='switch') css=`.cards { display: flex; flex-direction: column; gap: ${g}px; }\n\n@media (min-width: ${b}px) {\n  .cards { flex-direction: row; }\n  .card { flex: 1 1 0; }\n}`;
+  else if(m==='always-column') css=`.cards {\n  display: flex;\n  flex-direction: column;\n  gap: ${g}px;\n}`;
+  else css=`.cards {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  gap: ${g}px;\n}\n.card { flex: 1 1 240px; }`;
+  $('code').textContent=css;
+  const media=m==='switch'?`@media (min-width:${b}px){.cards{flex-direction:row}.card{flex:1 1 0}.nav{flex-direction:row;align-items:center}}` : m==='wrap'?`.cards{flex-direction:row;flex-wrap:wrap}.card{flex:1 1 240px}`:`.cards{flex-direction:column}`;
+  const inner=`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+  *{box-sizing:border-box}body{margin:0;padding:16px;font-family:Tahoma,sans-serif;color:#172033;background:#f5f7fb}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:#172f4d;color:white;border-radius:12px}.brand{font-weight:bold;font-size:17px}.nav{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#dbe9fa}.nav span{padding:2px 0}.intro{margin:16px 0 12px}.intro h2{font-size:18px;margin:0 0 4px}.intro p{margin:0;color:#66758a;font-size:12px}.cards{display:flex;flex-direction:${m==='wrap'?'row':'column'};gap:${g}px;${m==='wrap'?'flex-wrap:wrap;':''}}.card{background:white;border:1px solid #dbe3ee;border-radius:12px;padding:13px;box-shadow:0 4px 12px #1b365012;${m==='wrap'?'flex:1 1 240px;':''}}.art{height:70px;border-radius:8px;background:linear-gradient(135deg,#b6d7f5,#d9f2e7);margin-bottom:10px}.card:nth-child(2) .art{background:linear-gradient(135deg,#f6d6ad,#f7e9c9)}.card:nth-child(3) .art{background:linear-gradient(135deg,#cfc5f7,#e6ddfa)}.card h3{font-size:15px;margin:0 0 5px}.card p{font-size:12px;line-height:1.8;color:#5a687b;margin:0}.foot{margin-top:12px;padding:10px;border-radius:9px;background:#e7edf5;font-size:11px;color:#526176}
+  ${media}
+  </style></head><body><header class="head"><div class="brand">سایت نمونه</div><nav class="nav"><span>خانه</span><span>محصولات</span><span>درباره ما</span><span>تماس</span></nav></header><section class="intro"><h2>کارت‌های محتوایی</h2><p>چیدمان این بخش با Flexbox ساخته شده است.</p></section><section class="cards"><article class="card"><div class="art"></div><h3>کارت اول</h3><p>در نمایشگر باریک، کارت تمام عرض را می‌گیرد و در فضای عریض کنار کارت‌های دیگر قرار می‌گیرد.</p></article><article class="card"><div class="art"></div><h3>کارت دوم</h3><p>Flexbox فضای موجود را میان آیتم‌ها توزیع می‌کند؛ Media Query زمان تغییر جهت را تعیین می‌کند.</p></article><article class="card"><div class="art"></div><h3>کارت سوم</h3><p>محتوا ثابت است اما ساختار چیدمان با تغییر عرض محیط نمایش تغییر می‌کند.</p></article></section><div class="foot">عرض Viewport شبیه‌سازی‌شده: ${w}px · Breakpoint: ${b}px</div></body></html>`;
+  frame.width=w;frame.srcdoc=inner;
+ }
+ [width,bp,gap,mode].forEach(el=>el.addEventListener('input',update));
+ $('reset').onclick=()=>{width.value=390;bp.value=720;gap.value=12;mode.value='switch';update()};$('phone').onclick=()=>{width.value=390;update()};$('wide').onclick=()=>{width.value=1000;update()};update();
+})();
+</script></body></html>

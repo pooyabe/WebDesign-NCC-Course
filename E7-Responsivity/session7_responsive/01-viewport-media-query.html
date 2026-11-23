@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>آزمایشگاه Viewport و Media Query</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#192538;--panel2:#22324a;--line:#34455e;--text:#edf3fb;--muted:#aebbd0;--accent:#6dd6bd;--accent2:#84b7ff;--warn:#ffd27a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,#243b58 0,transparent 35%),var(--bg);color:var(--text);font-family:Tahoma,"Vazirmatn",sans-serif;line-height:1.8}
+.wrap{max-width:1400px;margin:auto;padding:26px}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}.eyebrow{color:var(--accent);font-size:13px;font-weight:bold}.top h1{margin:4px 0 6px;font-size:clamp(24px,3vw,36px)}.top p{margin:0;color:var(--muted);max-width:850px}.tag{border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--muted);white-space:nowrap;font-size:13px}
+.grid{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:18px}.panel{background:linear-gradient(180deg,#1c2a3f,#172337);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 14px 40px #0003}.panel h2{font-size:19px;margin:0 0 16px}.control{margin:0 0 20px}.control-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:7px}.control label{font-size:14px;color:#d9e5f5}.value{font:700 14px ui-monospace,monospace;color:var(--accent);direction:ltr}.hint{font-size:12px;color:var(--muted);margin-top:5px}input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}select{width:100%;background:#101a29;color:var(--text);border:1px solid #455a77;border-radius:10px;padding:11px;font:inherit}
+.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid #49617f;background:#263a55;color:var(--text);padding:9px 14px;border-radius:10px;font:inherit;cursor:pointer}.btn.primary{background:var(--accent);color:#10251f;border-color:var(--accent);font-weight:bold}.btn:hover{filter:brightness(1.12)}
+.preview-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.preview-head h2{margin:0}.live{font-size:13px;padding:5px 11px;border-radius:999px;background:#243e4a;color:var(--accent);border:1px solid #32665e}.stage{background:#0c1421;border:1px dashed #536783;border-radius:14px;padding:14px;overflow:auto;min-height:490px}.stage-inner{min-width:100%;display:flex;justify-content:flex-start}.stage iframe{display:block;border:0;border-radius:9px;background:white;box-shadow:0 12px 28px #0007;max-width:none}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.metric{background:#111d2d;border:1px solid var(--line);border-radius:12px;padding:12px}.metric small{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font:700 19px ui-monospace,monospace;direction:ltr;color:var(--accent2);margin-top:3px}.status{margin-top:12px;padding:12px 14px;border-radius:12px;background:#172e34;border:1px solid #356a61;color:#c6f6e9}.status.off{background:#352a19;border-color:#75592b;color:#ffe2ae}
+.codebox{margin-top:16px}.codebox h3{font-size:15px;margin:0 0 8px}.codebox pre{direction:ltr;text-align:left;white-space:pre;overflow:auto;margin:0;padding:15px;background:#0b1320;border:1px solid #2d4059;border-radius:12px;color:#d7e5f7;font:13px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}.note{margin-top:14px;color:var(--muted);font-size:12px}.footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.wrap{padding:15px}.top{display:block}.tag{display:inline-block;margin-top:12px}.stage{min-height:420px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><div><div class="eyebrow">کارگاه تعاملی CSS · بخش ۱</div><h1>Viewport و Media Query</h1><p>عرض محیط نمایش را تغییر بده، نوع شرط را انتخاب کن و ببین قانون CSS در چه نقطه‌ای فعال می‌شود. پیش‌نمایش داخل یک قاب مستقل با عرض شبیه‌سازی‌شده اجرا می‌شود.</p></div><div class="tag">فایل مستقل · بدون اینترنت</div></header>
+  <main class="grid">
+    <section class="panel">
+      <h2>تنظیمات آزمایش</h2>
+      <div class="control"><div class="control-head"><label for="width">عرض Viewport شبیه‌سازی‌شده</label><output class="value" id="widthOut">390px</output></div><input id="width" type="range" min="320" max="1280" step="10" value="390"><div class="hint">این مقدار عرض قاب پیش‌نمایش است؛ نه اندازه فیزیکی نمایشگر.</div></div>
+      <div class="control"><div class="control-head"><label for="breakpoint">Breakpoint</label><output class="value" id="bpOut">768px</output></div><input id="breakpoint" type="range" min="360" max="1100" step="10" value="768"></div>
+      <div class="control"><div class="control-head"><label for="mode">نوع Media Query</label></div><select id="mode"><option value="min">min-width — از این عرض به بالا</option><option value="max">max-width — تا این عرض و شامل آن</option></select></div>
+      <div class="actions"><button class="btn primary" id="reset">بازگرداندن تنظیمات</button><button class="btn" id="phone">موبایل 390px</button><button class="btn" id="tablet">تبلت 768px</button><button class="btn" id="desktop">دسکتاپ 1100px</button></div>
+      <div class="note">نکته: برای بررسی واقعی مرورگر، همین ایده را بعداً در Firefox Responsive Design Mode یا Device Toolbar مرورگر اجرا کن.</div>
+    </section>
+    <section class="panel">
+      <div class="preview-head"><h2>پیش‌نمایش زنده</h2><span class="live" id="liveBadge">قانون فعال است</span></div>
+      <div class="stage"><div class="stage-inner"><iframe id="demo" title="پیش‌نمایش واکنش‌گرا" width="390" height="420"></iframe></div></div>
+      <div class="metrics"><div class="metric"><small>عرض قاب</small><strong id="metricWidth">390px</strong></div><div class="metric"><small>Breakpoint</small><strong id="metricBp">768px</strong></div><div class="metric"><small>شرط فعلی</small><strong id="metricMode">min-width</strong></div></div>
+      <div id="status" class="status">در این عرض، شرط Media Query برقرار است.</div>
+      <div class="codebox"><h3>کد CSS متناظر با تنظیمات فعلی</h3><pre id="code"></pre></div>
+    </section>
+  </main>
+  <div class="footer">آزمایشگاه آموزشی طراحی صفحات وب · همه پردازش‌ها محلی و داخل مرورگر انجام می‌شوند.</div>
+</div>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ const width=$('width'), bp=$('breakpoint'), mode=$('mode'), frame=$('demo');
+ const esc = s => s;
+ function update(){
+   const w=Number(width.value), b=Number(bp.value), m=mode.value;
+   const active = m==='min' ? w>=b : w<=b;
+   $('widthOut').textContent=w+'px'; $('bpOut').textContent=b+'px';
+   $('metricWidth').textContent=w+'px'; $('metricBp').textContent=b+'px'; $('metricMode').textContent=m+'-width';
+   $('liveBadge').textContent=active?'قانون فعال است':'قانون فعال نیست';
+   $('liveBadge').style.color=active?'#6dd6bd':'#ffd27a';
+   $('status').className='status'+(active?'':' off');
+   $('status').textContent=active ? `شرط ${m}-width برقرار است؛ استایل داخل بلوک @media اعمال می‌شود.` : `شرط ${m}-width برقرار نیست؛ استایل پایه نمایش داده می‌شود.`;
+   const query = m==='min' ? `(min-width: ${b}px)` : `(max-width: ${b}px)`;
+   const base = m==='min'
+     ? `.banner { background: #dcecff; color: #17375e; }\n.banner::after { content: "حالت پایه: باریک"; }`
+     : `.banner { background: #17375e; color: white; }\n.banner::after { content: "حالت پایه: عریض"; }`;
+   const changed = m==='min'
+     ? `.banner { background: #176b59; color: white; }\n.banner::after { content: "Media Query فعال شد: عریض"; }`
+     : `.banner { background: #9a5b16; color: white; }\n.banner::after { content: "Media Query فعال شد: باریک"; }`;
+   $('code').textContent = `${base}\n\n@media ${query} {\n  ${changed.replaceAll('\n','\n  ')}\n}`;
+   const inner = `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+   *{box-sizing:border-box}body{margin:0;padding:18px;font-family:Tahoma,sans-serif;background:#f1f4f8;color:#172033}header{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #cbd5e1;padding-bottom:12px}header b{font-size:20px;color:#142c4c}nav{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#42536a}.banner{margin-top:18px;padding:22px 16px;border-radius:13px;font-weight:bold;font-size:18px;line-height:1.8}.banner::after{display:block;font-size:13px;opacity:.85;margin-top:8px}.info{margin-top:15px;padding:13px;border:1px solid #d5deea;border-radius:10px;background:white;color:#334155;font-size:13px}.width{direction:ltr;font:12px monospace;color:#64748b;margin-top:16px}
+   ${m==='min'?`.banner{background:#dcecff;color:#17375e}.banner::after{content:"حالت پایه: باریک"}`:`.banner{background:#17375e;color:white}.banner::after{content:"حالت پایه: عریض"}`}
+   ${m==='min'?`@media (min-width:${b}px){.banner{background:#176b59;color:white}.banner::after{content:"Media Query فعال شد: عریض"}}`:`@media (max-width:${b}px){.banner{background:#9a5b16;color:white}.banner::after{content:"Media Query فعال شد: باریک"}`}
+   </style></head><body><header><b>وب‌سایت نمونه</b><nav><span>خانه</span><span>درباره ما</span><span>خدمات</span><span>تماس</span></nav></header><div class="banner">رفتار صفحه با عرض محیط نمایش تغییر می‌کند</div><div class="info">این قاب یک سند HTML جداگانه است. Media Query داخل آن، عرض Viewport همین قاب را بررسی می‌کند.</div><div class="width">Simulated viewport: ${w}px</div></body></html>`;
+   frame.width=w; frame.srcdoc=inner;
+ }
+ [width,bp,mode].forEach(el=>el.addEventListener('input',update));
+ $('reset').addEventListener('click',()=>{width.value=390;bp.value=768;mode.value='min';update()});
+ $('phone').addEventListener('click',()=>{width.value=390;update()});
+ $('tablet').addEventListener('click',()=>{width.value=768;update()});
+ $('desktop').addEventListener('click',()=>{width.value=1100;update()});
+ update();
+})();
+</script>
+</body>
+</html>
